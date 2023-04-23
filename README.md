@@ -14,6 +14,7 @@ The TurtleBot model used was a TurtleBot3 burger with a ROS Noetic Ubuntu Server
 ## Project Structure
 For simplicity of the code submission, both the packages running on the ROS master and on the TurtleBot are included in this repository. The `turtlebot_packages` folder contains the packages used on the TurtleBot, and the other folders are the packages run on the ROS master.
 
+Some of the old pose estimation is in the pose_estimation folder. This was not used as a node.
 ## Running the Project
 ### ROS Master
 Start ROS with
@@ -53,7 +54,6 @@ rosrun tag_placer tagplacer.py
 rosrun tag_placer tagtf.py
 ```
 
-Some of the old pose estimation is in the pose_estimation folder. This was not used as a node.
 
 Run the SLAM node 
 ```
