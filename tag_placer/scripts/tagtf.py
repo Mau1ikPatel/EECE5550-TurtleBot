@@ -9,7 +9,9 @@ import tf2_ros
 import tf2_geometry_msgs
 
 
+# Initialize the node
 rospy.init_node('tagtfplacenode', anonymous=True)
+# Create a publisher to publish the tag pose in the map frame
 pub = rospy.Publisher('tagtf2place', PoseStamped, queue_size=10)
 buffer = tf2_ros.Buffer()
 
@@ -18,10 +20,10 @@ tflistener = tf2_ros.TransformListener(buffer)
 def tag_tfs_callback(tag2place):
     tag_pose = tag2place.pose
     
-    # transformed_pose = tflistener.transformPose('map',tag_pose)
-    # trans = buffer.lookup_transform('map', tag2place.header.frame_id, rospy.Time())
+    # Convert the apriltag detection (camera frame) to a PoseStamped message in the map frame
     trans = buffer.lookup_transform('map', 'camera_link', rospy.Time())
     
+    # Create a transform message
     transform = tf2_ros.TransformStamped()
 
     transform.transform.translation.x = trans.transform.translation.x
@@ -32,26 +34,13 @@ def tag_tfs_callback(tag2place):
     transform.transform.rotation.z = trans.transform.rotation.z
     transform.transform.rotation.w = trans.transform.rotation.w
 
+    # Transform the tag pose from the camera frame to the map frame
     pose_transformed = tf2_geometry_msgs.do_transform_pose(tag2place, transform)
     pose_transformed.header.frame_id = 'map'
     
+    # Publish the tag pose in the map frame
     rospy.loginfo(pose_transformed)
     pub.publish(pose_transformed)    
-    
-    # tagIDstr = "map"
-    # pose_msg = PoseStamped()
-    # pose_msg.header.frame_id = tagIDstr
-    # pose_msg.pose.position.x = transformed_pose.position.x
-    # pose_msg.pose.position.y = transformed_pose.position.y
-    # pose_msg.pose.position.z = transformed_pose.position.z
-    # pose_msg.pose.orientation.x = transformed_pose.orientation.x
-    # pose_msg.pose.orientation.y = transformed_pose.orientation.y
-    # pose_msg.pose.orientation.z = transformed_pose.orientation.z
-    # pose_msg.pose.orientation.w = transformed_pose.orientation.w
-
-    # rospy.loginfo(pose_msg)
-    # pub.publish(pose_msg)
-
 
 
 def talker():

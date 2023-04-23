@@ -7,22 +7,19 @@ from apriltag_ros.msg import AprilTagDetectionArray, AprilTagDetection
 import tf.transformations as tft
 import numpy as np
 
+# Create a publisher to publish the tag pose 
 pub = rospy.Publisher('tag2place', PoseStamped, queue_size=10)
 
 
 def tag_detections_callback(tag_detections):
     # Loop through all detected tags
     for detection in tag_detections.detections:
+        # Extract tag information
         tag_id = detection.id
         tag_pose = detection.pose.pose.pose
-        #rospy.loginfo(tag_pose)
         tag_size = detection.size
-        # print("Detected tag with ID:", tag_id)
-        # print("Tag pose:")
-        # print(tag_pose)
-        # print("Tag size:", tag_size)
 
-        tagID=1
+        # Convert the apriltag detection to a PoseStamped message in the camera_link frame
         tagIDstr = "camera_link"
         pose_msg = PoseStamped()
         pose_msg.header.frame_id = tagIDstr
@@ -35,33 +32,16 @@ def tag_detections_callback(tag_detections):
         pose_msg.pose.orientation.z = tag_pose.orientation.z
         pose_msg.pose.orientation.w = tag_pose.orientation.w
 
-        # # apply a 90 degree rotation about the x axis
-        # q = tft.quaternion_from_euler(tft.pi / 2, 0, 0)
-        # R = np.array([[0,1,0,0], [0,0,1,0], [1,0,0,0], [0,0,0,1]])
-        
-        # q = tft.quaternion_from_matrix(R)
-        # print(np.shape(q))
-        # # # get a quaternion of the og pose
-        # q_old = [pose_msg.pose.orientation.x, pose_msg.pose.orientation.y,
-        #          pose_msg.pose.orientation.z, pose_msg.pose.orientation.w]
-        # print(np.shape(q_old))
-        # q_new = tft.quaternion_multiply(q_old, q)
-
-        # pose_msg.pose.orientation.x = q_new[0]
-        # pose_msg.pose.orientation.y = q_new[1]
-        # pose_msg.pose.orientation.z = q_new[2]
-        # pose_msg.pose.orientation.w = q_new[3]
-
-        
-
         rospy.loginfo(pose_msg)
         pub.publish(pose_msg)
 
 
 
 def talker():
+    # Initialize the node
     rospy.init_node('tagplacenode', anonymous=True)
     rate = rospy.Rate(10) # 10hz
+    # Subscribe to the tag_detections topic to get AprilTag detections
     rospy.Subscriber('tag_detections', AprilTagDetectionArray, tag_detections_callback)
 
     while not rospy.is_shutdown():
