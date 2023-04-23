@@ -53,6 +53,8 @@ rosrun tag_placer tagplacer.py
 rosrun tag_placer tagtf.py
 ```
 
+Some of the old pose estimation is in the pose_estimation folder. This was not used as a node.
+
 Run the SLAM node 
 ```
 roslaunch turtlebot3_slam turtlebot3_slam.launch slam_methods:=gmapping
